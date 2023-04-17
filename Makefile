@@ -4,17 +4,22 @@ SHELL := /bin/bash
 currentDir := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 imageName := $(notdir $(patsubst %/,%,$(dir $(currentDir))))
 dockerOpts := --name $(imageName) --rm ${imageName}:latest
-dockerRegistry := devpi.local:443
+dockerRegistry := registry.internal.curnowtopia.com
+platforms := linux/amd64,linux/arm/v7
 
 docker-build:
-	docker build \
-	  -t ${imageName}:latest  \
+	docker buildx build \
+          --platform ${platforms} \
+          --output type=image,name=${imageName} \
+	  --tag ${imageName}:latest  \
 	  ${currentDir}
 
 docker-build-no-cache:
-	docker build \
+	docker buildx build \
 	  --no-cache \
-	  -t ${imageName}:latest  \
+          --platform ${platforms} \
+          --output type=image \
+	  --tag ${imageName}:latest  \
 	  ${currentDir}
 
 docker-run:
@@ -46,8 +51,9 @@ ifndef version
 	@echo "Must specify 'version' when publishing."
 	exit 1
 endif
-	docker build \
-	  -t ${dockerRegistry}/${imageName}:${version} \
+	docker buildx build \
+          --platform ${platforms} \
+	  --push \
+	  --tag ${dockerRegistry}/${imageName}:${version} \
 	  ${currentDir} 
-
-	docker push ${dockerRegistry}/${imageName}:${version}
+     
