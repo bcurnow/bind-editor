@@ -55,5 +55,8 @@ endif
           --platform ${platforms} \
 	  --push \
 	  --tag ${dockerRegistry}/${imageName}:${version} \
-	  ${currentDir} 
-     
+	  ${currentDir}
+
+	# Create git tag as well
+	git tag -a -m "Release ${version}" v${version}
+	git push origin v${version}
