@@ -58,5 +58,5 @@ endif
 	  ${currentDir}
 
 	# Create git tag as well
-	git tag -a -m "Release ${version}" v${version}
-	git push origin v${version}
+	git tag -a -f -m "Release ${version}" v${version}
+	git push -f origin v${version}
