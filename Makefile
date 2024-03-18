@@ -9,18 +9,21 @@ platforms := linux/amd64,linux/arm/v7
 
 docker-build:
 	docker buildx build \
-          --platform ${platforms} \
-          --output type=image,name=${imageName} \
-	  --tag ${imageName}:latest  \
-	  ${currentDir}
+		--push \
+		--platform ${platforms} \
+		--output type=image,name=${imageName} \
+		--tag ${dockerRegistry}/${imageName}:latest  \
+		--output type=image \
+		${currentDir}
 
 docker-build-no-cache:
 	docker buildx build \
-	  --no-cache \
-          --platform ${platforms} \
-          --output type=image \
-	  --tag ${imageName}:latest  \
-	  ${currentDir}
+		--no-cache \
+		--push \
+		--platform ${platforms} \
+		--output type=image,name=${imageName} \
+		-tag ${dockerRegistry}/${imageName}:latest  \
+		${currentDir}
 
 docker-run:
 	docker run -d ${dockerOpts}
@@ -52,10 +55,10 @@ ifndef version
 	exit 1
 endif
 	docker buildx build \
-          --platform ${platforms} \
-	  --push \
-	  --tag ${dockerRegistry}/${imageName}:${version} \
-	  ${currentDir}
+		--platform ${platforms} \
+		--push \
+		--tag ${dockerRegistry}/${imageName}:${version} \
+		${currentDir}
 
 	# Create git tag as well
 	git tag -a -m "Release ${version}" v${version}
